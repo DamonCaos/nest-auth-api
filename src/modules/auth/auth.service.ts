@@ -1,27 +1,66 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
-  register(registerDto: RegisterDto) {
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async register(registerDto: RegisterDto) {
+    const existingUser = this.usersService.findByEmail(registerDto.email);
+
+    if (existingUser) {
+      throw new BadRequestException('Email already registered');
+    }
+
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+
+    const newUser = this.usersService.create({
+      id: Date.now(),
+      name: registerDto.name,
+      email: registerDto.email,
+      password: hashedPassword,
+    });
+
+    const { password, ...safeUser } = newUser;
+
     return {
       message: 'User registered successfully',
-      user: {
-        id: 1,
-        name: registerDto.name,
-        email: registerDto.email,
-      },
+      user: safeUser,
     };
   }
 
-  login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto) {
+    const user = this.usersService.findByEmail(loginDto.email);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      loginDto.password,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const payload = { sub: user.id, email: user.email, name: user.name };
+
     return {
       message: 'Login successful',
-      accessToken: 'mock-jwt-token',
-      user: {
-        email: loginDto.email,
-      },
+      accessToken: await this.jwtService.signAsync(payload),
     };
   }
 }

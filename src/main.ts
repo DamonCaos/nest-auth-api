@@ -17,9 +17,10 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Optimissa Nest API')
+    .setTitle('DamonCaos Nest API')
     .setDescription('Mini API backend con NestJS para portfolio')
     .setVersion('1.0.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
