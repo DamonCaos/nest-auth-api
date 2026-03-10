@@ -17,7 +17,7 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const existingUser = this.usersService.findByEmail(registerDto.email);
+    const existingUser = await this.usersService.findByEmail(registerDto.email);
 
     if (existingUser) {
       throw new BadRequestException('Email already registered');
@@ -25,8 +25,7 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
-    const newUser = this.usersService.create({
-      id: Date.now(),
+    const newUser = await this.usersService.create({
       name: registerDto.name,
       email: registerDto.email,
       password: hashedPassword,
@@ -41,7 +40,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = this.usersService.findByEmail(loginDto.email);
+    const user = await this.usersService.findByEmail(loginDto.email);
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
