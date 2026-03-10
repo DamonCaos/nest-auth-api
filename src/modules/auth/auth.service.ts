@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { Role } from '@prisma/client';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -29,6 +30,7 @@ export class AuthService {
       name: registerDto.name,
       email: registerDto.email,
       password: hashedPassword,
+      role: Role.USER,
     });
 
     const { password, ...safeUser } = newUser;
@@ -55,7 +57,12 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { sub: user.id, email: user.email, name: user.name };
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    };
 
     return {
       message: 'Login successful',

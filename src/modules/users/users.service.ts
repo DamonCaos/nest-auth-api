@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma, Role } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
@@ -11,7 +12,12 @@ export class UsersService {
     });
   }
 
-  create(userData: { name: string; email: string; password: string }) {
+  create(userData: {
+    name: string;
+    email: string;
+    password: string;
+    role: Role;
+  }) {
     return this.prisma.user.create({
       data: userData,
     });
@@ -23,6 +29,7 @@ export class UsersService {
         id: true,
         name: true,
         email: true,
+        role: true,
         createdAt: true,
         updatedAt: true,
       },
