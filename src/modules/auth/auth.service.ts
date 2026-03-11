@@ -4,8 +4,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
 import { Role } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -15,6 +16,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -33,7 +35,7 @@ export class AuthService {
       role: Role.USER,
     });
 
-    const { password, ...safeUser } = newUser;
+    const { password, hashedRefreshToken, ...safeUser } = newUser;
 
     return {
       message: 'User registered successfully',
@@ -57,16 +59,93 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-    };
+    const tokens = await this.generateTokens(
+      user.id,
+      user.email,
+      user.name,
+      user.role,
+    );
+
+    const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
+
+    await this.usersService.updateHashedRefreshToken(
+      user.id,
+      hashedRefreshToken,
+    );
 
     return {
       message: 'Login successful',
-      accessToken: await this.jwtService.signAsync(payload),
+      ...tokens,
+    };
+  }
+
+  async refreshToken(userId: number, refreshToken: string) {
+    const user = await this.usersService.findById(userId);
+
+    if (!user || !user.hashedRefreshToken) {
+      throw new UnauthorizedException('Access denied');
+    }
+
+    const refreshTokenMatches = await bcrypt.compare(
+      refreshToken,
+      user.hashedRefreshToken,
+    );
+
+    if (!refreshTokenMatches) {
+      throw new UnauthorizedException('Access denied');
+    }
+
+    const tokens = await this.generateTokens(
+      user.id,
+      user.email,
+      user.name,
+      user.role,
+    );
+
+    const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
+
+    await this.usersService.updateHashedRefreshToken(
+      user.id,
+      hashedRefreshToken,
+    );
+
+    return tokens;
+  }
+
+  async logout(userId: number) {
+    await this.usersService.updateHashedRefreshToken(userId, null);
+
+    return {
+      message: 'Logout successful',
+    };
+  }
+
+  private async generateTokens(
+    userId: number,
+    email: string,
+    name: string,
+    role: Role,
+  ) {
+    const payload = {
+      sub: userId,
+      email,
+      name,
+      role,
+    };
+
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>('JWT_SECRET'),
+      expiresIn: this.configService.get<number>('JWT_EXPIRES_IN'),
+    });
+
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>('JWT_SECRET'),
+      expiresIn: '7d',
+    });
+
+    return {
+      accessToken,
+      refreshToken,
     };
   }
 }

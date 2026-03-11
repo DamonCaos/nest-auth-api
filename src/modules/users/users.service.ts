@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, Role } from '@prisma/client';
+import { Role } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
@@ -12,6 +12,12 @@ export class UsersService {
     });
   }
 
+  findById(id: number) {
+    return this.prisma.user.findUnique({
+      where: { id },
+    });
+  }
+
   create(userData: {
     name: string;
     email: string;
@@ -20,6 +26,13 @@ export class UsersService {
   }) {
     return this.prisma.user.create({
       data: userData,
+    });
+  }
+
+  updateHashedRefreshToken(userId: number, hashedRefreshToken: string | null) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { hashedRefreshToken },
     });
   }
 
