@@ -1,5 +1,5 @@
 import {
-  BadRequestException,
+  ConflictException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -23,7 +23,7 @@ export class AuthService {
     const existingUser = await this.usersService.findByEmail(registerDto.email);
 
     if (existingUser) {
-      throw new BadRequestException('Email already registered');
+      throw new ConflictException('Email already registered');
     }
 
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
