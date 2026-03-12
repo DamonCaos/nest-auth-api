@@ -10,6 +10,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { SeedService } from './seed/seed.service';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { PrismaModule } from './prisma/prisma.module';
   controllers: [AppController],
   providers: [
     AppService,
+    SeedService,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
