@@ -1,3 +1,9 @@
+![NestJS](https://img.shields.io/badge/NestJS-Backend-red)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)
+![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-336791)
+![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED)
+
 # NestJS Auth API Starter
 
 Backend API built with **NestJS**, **Prisma**, and **PostgreSQL**, designed as a reusable authentication and authorization starter for modern web applications.
