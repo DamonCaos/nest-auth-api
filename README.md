@@ -1,98 +1,275 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# NestJS Auth API Starter
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend API built with **NestJS**, **Prisma**, and **PostgreSQL**, designed as a reusable authentication and authorization starter for modern web applications.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This project implements a **secure, production-oriented authentication system** including JWT authentication, refresh tokens, role-based authorization, rate limiting and database persistence.
 
-## Description
+It serves as a **foundation backend** that can be reused in future fullstack projects.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+# Features
 
-```bash
-$ npm install
+### Authentication
+- JWT authentication
+- Access Token + Refresh Token flow
+- Secure refresh token rotation
+- Logout with token invalidation
+
+### Authorization
+- Role-based access control (RBAC)
+- Custom `Roles` decorator
+- `RolesGuard` for protected routes
+
+### Security
+- Password hashing with **bcrypt**
+- Refresh tokens stored **hashed in database**
+- **Rate limiting** with NestJS Throttler
+- Environment validation with **Zod**
+- Prisma error handling filter
+
+### Database
+- PostgreSQL
+- Prisma ORM
+- Prisma migrations
+- Prisma Studio support
+
+### Developer Experience
+- Swagger API documentation
+- DTO validation with `class-validator`
+- Modular architecture
+- Dockerized database
+
+---
+
+# Tech Stack
+
+| Layer | Technology |
+|------|-------------|
+Backend Framework | NestJS
+Language | TypeScript
+ORM | Prisma
+Database | PostgreSQL
+Auth | JWT
+Containerization | Docker
+Validation | Zod + class-validator
+Documentation | Swagger
+
+---
+
+# Architecture
+
+```
+Client
+↓
+NestJS Controllers
+↓
+Services
+↓
+Prisma ORM
+↓
+PostgreSQL (Docker)
 ```
 
-## Compile and run the project
+Authentication flow:
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```
+Login
+↓
+Access Token (short lived)
+Refresh Token (stored hashed in DB)
 ```
 
-## Run tests
+---
 
-```bash
-# unit tests
-$ npm run test
+# Project Structure
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```
+src
+│
+├── modules
+│   ├── auth
+│   │   ├── controllers
+│   │   ├── guards
+│   │   ├── strategies
+│   │   ├── decorators
+│   │   └── dto
+│   │
+│   ├── users
+│   └── health
+│
+├── prisma
+│   ├── prisma.service.ts
+│   └── prisma.module.ts
+│
+├── seed
+│   └── seed.service.ts
+│
+├── common
+│   └── filters
+│       └── prisma-exception.filter.ts
+│
+└── config
+    └── validate-env.ts
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+# Getting Started
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 1. Clone the repository
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+git clone https://github.com/DamonCaos/nest-auth-api.git
+cd nest-auth-api
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 2. Install dependencies
 
-## Resources
+```bash
+npm install
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+---
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+# Environment Variables
 
-## Support
+Create a `.env` file:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/nestdb"
+JWT_SECRET="supersecretkey"
+JWT_EXPIRES_IN=3600
+```
 
-## Stay in touch
+Environment variables are validated using **Zod**, so the application will not start if something is missing.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
 
-## License
+# Start PostgreSQL (Docker)
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```bash
+docker compose up -d
+```
+
+Verify the container:
+
+```bash
+docker ps
+```
+
+---
+
+# Database Migration
+
+```bash
+npx prisma migrate dev
+```
+
+---
+
+# Run the application
+
+Development mode:
+
+```bash
+npm run start:dev
+```
+
+---
+
+# Prisma Studio
+
+Visual database interface:
+
+```bash
+npx prisma studio
+```
+
+---
+
+# API Documentation
+
+Swagger documentation is available at:
+
+```
+http://localhost:3000/docs
+```
+
+---
+
+# Default Admin Account
+
+The application automatically creates an admin user at startup if it does not exist.
+
+```
+email: admin@example.com
+password: Admin123!
+```
+
+This allows immediate testing of **admin-only endpoints**.
+
+---
+
+# Main API Endpoints
+
+## Authentication
+
+```
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/refresh
+POST /api/auth/logout
+```
+
+## User
+
+```
+GET /api/users
+GET /api/users/me
+```
+
+---
+
+# Security Features
+
+- JWT authentication
+- Refresh token rotation
+- Hashed refresh tokens in database
+- Role-based authorization
+- Rate limiting on auth endpoints
+- Environment validation
+- Prisma exception handling
+
+---
+
+# Future Improvements
+
+Possible extensions for this backend:
+
+- Email verification
+- Password reset flow
+- OAuth login (Google / GitHub)
+- Redis session storage
+- WebSocket support
+- Integration with frontend clients
+
+---
+
+# Author
+
+**Francisco Javier Rodríguez**
+
+Fullstack Developer (Node.js / React)
+
+GitHub  
+https://github.com/DamonCaos
+
+LinkedIn  
+https://www.linkedin.com/in/francisco-javier-rodriguez-romera-1410b628b
+
+---
+
+# License
+
+MIT
