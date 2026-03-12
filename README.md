@@ -262,6 +262,19 @@ Possible extensions for this backend:
 
 ---
 
+## Quick Start
+
+```bash
+git clone https://github.com/DamonCaos/nest-auth-api.git
+cd nest-auth-api
+cp .env.example .env
+npm install
+docker compose up -d
+npx prisma migrate dev
+npm run start:dev
+```
+---
+
 # Author
 
 **Francisco Javier Rodríguez**
